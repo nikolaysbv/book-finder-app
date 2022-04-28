@@ -3,10 +3,13 @@ import { createRoot } from "react-dom/client"
 import "normalize.css" // resetting css
 import "./index.css"
 import App from "./App"
+import { AppProvider } from "./contexts"
 
 const root = createRoot(document.getElementById("root"))
 root.render(
   <React.StrictMode>
-    <App />
+    <AppProvider>
+      <App />
+    </AppProvider>
   </React.StrictMode>
 )
