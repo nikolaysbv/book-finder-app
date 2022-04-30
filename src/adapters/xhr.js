@@ -10,7 +10,7 @@ const getVolumes = async (queryParams, queryCategory, startIndex) => {
   const response = await googleBooksInstance.get(
     `volumes?key=${
       process.env.REACT_APP_API_KEY
-    }&maxResults=15&startIndex=${startIndex}${
+    }&langRestrict=en&printType=books&maxResults=30&startIndex=${startIndex}${
       queryCategory
         ? `&q=+${queryCategory}:${queryParams}`
         : `&q=${queryParams}`

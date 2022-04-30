@@ -3,23 +3,15 @@ import SingleBook from "./SingleBook"
 import { useGlobalContext } from "../contexts"
 
 function Books() {
-  const { books, isBooksLoading, setStartIndex, setIsGettingNewImages } =
-    useGlobalContext()
+  const { books, isBooksLoading, errorHandler } = useGlobalContext()
 
-  const getMoreBooks = () => {
-    if (
-      window.innerHeight + window.scrollY >=
-      document.body.scrollHeight - 750
-    ) {
-      setIsGettingNewImages(true)
-      console.log("now")
-    }
+  if (isBooksLoading) {
+    return <h2>Loading...</h2>
   }
 
-  useEffect(() => {
-    window.addEventListener("scroll", getMoreBooks)
-    return () => window.removeEventListener("scroll", getMoreBooks)
-  }, [])
+  if (errorHandler[0]) {
+    return <h2>{errorHandler[1]}</h2>
+  }
 
   return (
     <section className="books">

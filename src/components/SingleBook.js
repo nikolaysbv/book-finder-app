@@ -8,7 +8,8 @@ function SingleBook({ book }) {
     : "No author"
   const title = book.volumeInfo?.title || "No title"
   const subtitle = book.volumeInfo?.subtitle
-  const image = book.volumeInfo?.imageLinks?.thumbnail || ""
+  const image =
+    book.volumeInfo?.imageLinks?.thumbnail || "/images/no-image.webp"
   const desc = book.volumeInfo?.description || "No description"
 
   return (

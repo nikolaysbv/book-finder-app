@@ -4,62 +4,68 @@ import { getVolumes } from "../adapters/xhr"
 const AppContext = React.createContext()
 
 const AppProvider = ({ children }) => {
-  const [queryParams, setQueryParams] = useState("game") //set to empty
+  const [queryParams, setQueryParams] = useState("martin")
+  const [prevQueryParams, setPrevQueryParams] = useState("")
   const [queryCategory, setQueryCategory] = useState("")
-  const [startIndex, setStartIndex] = useState(0)
-  const [isGettingNewImages, setIsGettingNewImages] = useState(false)
-  const [page, setPage] = useState(1)
+  const [prevQueryCategory, setPrevQueryCategory] = useState("")
+  const [searchPlaceholder, setSearchPlaceholder] = useState(
+    "Try name, author, subject, ISBN..."
+  )
   const [isBooksLoading, setIsBooksLoading] = useState(true)
-  const [isError, setIsError] = useState(false)
+  const [errorHandler, setErrorHandler] = useState([false, ""])
   const [books, setBooks] = useState([])
+  const [page, setPage] = useState(1)
+  const [pagesAmount, setPagesAmount] = useState(1)
 
   useEffect(() => {
     setIsBooksLoading(true)
-    getVolumes(queryParams, queryCategory, 0)
+    setErrorHandler([false, ""])
+    const startIndex = (page - 1) * 30
+    getVolumes(queryParams, queryCategory, startIndex)
       .then((data) => {
+        console.log(data.items)
+        if (!data.items) {
+          setBooks([])
+          setErrorHandler([
+            true,
+            "No books found. Please review your search phrase.",
+          ])
+        }
+        if (
+          prevQueryParams !== queryParams ||
+          prevQueryCategory !== queryCategory
+        ) {
+          console.log("now")
+          setPagesAmount(Math.ceil(data.totalItems / 30))
+        }
+        setPrevQueryParams(queryParams)
+        setPrevQueryCategory(queryCategory)
         setBooks(data.items)
         setIsBooksLoading(false)
       })
       .catch((error) => {
-        setIsError(true)
+        setErrorHandler([true, error.response.data.error.message])
         setIsBooksLoading(false)
       })
-  }, [queryParams, queryCategory])
-
-  useEffect(() => {
-    // if (!mounted.current) {
-    //   mounted.current = true
-    //   return
-    // }
-    if (!isGettingNewImages) return
-    if (isBooksLoading) return
-    setPage((oldPage) => oldPage + 1)
-  }, [isGettingNewImages])
-
-  useEffect(() => {
-    setIsBooksLoading(true)
-    getVolumes(queryParams, queryCategory, 0)
-      .then((data) => {
-        setBooks(data.items)
-        setIsBooksLoading(false)
-      })
-      .then(() => setIsGettingNewImages(false))
-      .catch((error) => {
-        setIsError(true)
-        setIsBooksLoading(false)
-      })
-  }, [page])
+  }, [queryParams, queryCategory, page])
 
   return (
     <AppContext.Provider
       value={{
         books,
         isBooksLoading,
-        isError,
+        errorHandler,
+        queryParams,
         setQueryParams,
+        queryCategory,
         setQueryCategory,
-        setStartIndex,
-        setIsGettingNewImages,
+        searchPlaceholder,
+        setSearchPlaceholder,
+        page,
+        setPage,
+        pagesAmount,
+        setPrevQueryParams,
+        setPrevQueryCategory,
       }}
     >
       {children}
